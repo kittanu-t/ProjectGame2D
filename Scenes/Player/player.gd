@@ -1,46 +1,61 @@
 extends CharacterBody2D
 
-# ---- Config ----
-const GRAVITY = 1200
-const MOVE_SPEED = 200
-const JUMP_VELOCITY_MIN = -300   # กระโดดเบาสุด
-const JUMP_VELOCITY_MAX = -600   # กระโดดแรงสุด
-const MAX_CHARGE_TIME = 1.0      # วินาที
+# --- Exported tunable variables ---
+@export var MOVE_SPEED: float = 200.0
+@export var GRAVITY: float = 900.0
+@export var CHARGE_RATE: float = 400.0
+@export var MAX_JUMP_FORCE: float = 900.0
+@export var MIN_JUMP_FORCE: float = 300.0
+@export var AIR_CONTROL_FACTOR: float = 0.3
 
-# ---- State ----
-var jump_charge := 0.0
-var is_charging := false
+# --- Internal state ---
+enum PlayerState { IDLE, MOVING, CHARGING, JUMPING }
+var state: PlayerState = PlayerState.IDLE
+var jump_charge: float = 0.0
 
-func _physics_process(delta):
-	# แรงโน้มถ่วง
+func _physics_process(delta: float) -> void:
+	# --- Apply gravity always ---
 	if not is_on_floor():
 		velocity.y += GRAVITY * delta
 
-	# การเคลื่อนที่ซ้ายขวา
-	var input_dir = Input.get_axis("Move_Left", "Move_Right")
-	velocity.x = input_dir * MOVE_SPEED
+	match state:
+		PlayerState.IDLE, PlayerState.MOVING:
+			handle_movement(delta)
 
-	# กดปุ่ม jump (เริ่มชาร์จ)
-	if Input.is_action_just_pressed("Jump") and is_on_floor():
-		is_charging = true
-		jump_charge = 0.0
-		print("⚡ Start charging jump")
+			# Start charging jump
+			if Input.is_action_just_pressed("Jump") and is_on_floor():
+				state = PlayerState.CHARGING
+				jump_charge = 0.0
 
-	# ค้างปุ่ม jump (เก็บ charge)
-	if is_charging and Input.is_action_pressed("Jump"):
-		jump_charge = clamp(jump_charge + delta / MAX_CHARGE_TIME, 0.0, 1.0)
-		print("⏳ Charging... ", jump_charge)
+		PlayerState.CHARGING:
+			# Keep charging while button held
+			if Input.is_action_pressed("Jump"):
+				jump_charge += CHARGE_RATE * delta
+				jump_charge = min(jump_charge, MAX_JUMP_FORCE)
+			else:
+				# Release jump -> apply force
+				if is_on_floor():
+					velocity.y = -max(jump_charge, MIN_JUMP_FORCE)
+					state = PlayerState.JUMPING
+				jump_charge = 0.0
 
-	# ปล่อยปุ่ม jump (กระโดด)
-	if is_charging and Input.is_action_just_released("Jump"):
-		do_charged_jump()
-		is_charging = false
-		jump_charge = 0.0
+		PlayerState.JUMPING:
+			handle_air_control(delta)
+			if is_on_floor():
+				state = PlayerState.IDLE
 
 	move_and_slide()
 
-func do_charged_jump():
-	# Interpolate ระหว่าง MIN และ MAX ตาม charge
-	var jump_velocity = lerp(JUMP_VELOCITY_MIN, JUMP_VELOCITY_MAX, jump_charge)
-	velocity.y = jump_velocity
-	print("🚀 Jump! charge=", jump_charge, " | velocity.y=", velocity.y)
+
+func handle_movement(delta: float) -> void:
+	var input_dir = Input.get_axis("Move_Left", "Move_Right")
+	velocity.x = input_dir * MOVE_SPEED
+	if abs(input_dir) > 0:
+		state = PlayerState.MOVING
+	else:
+		state = PlayerState.IDLE
+
+
+func handle_air_control(delta: float) -> void:
+	var input_dir = Input.get_axis("Move_Left", "Move_Right")
+	velocity.x = lerp(velocity.x, input_dir * MOVE_SPEED, AIR_CONTROL_FACTOR * delta)
