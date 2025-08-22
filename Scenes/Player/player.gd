@@ -16,9 +16,9 @@ extends CharacterBody2D
 ## Friction while on group (how quickly the player slows down)
 @export_range(0, 50) var friction := 50.0
 ## Acceleration while in the air (how quickly the player reaches max speed)
-@export_range(0, 500) var air_acceleration := 5.0
+@export_range(0, 500) var air_acceleration := 0
 ## Air friction while in the air (how quickly the player slows down)
-@export_range(0, 50) var air_resistance := 50.0
+@export_range(0, 50) var air_resistance := 0
 ## Sets a variable max speed depending on how far the joystick is pushed
 @export var is_variable_max_speed := false
 ## sets a minimum speed based on min_speed
@@ -33,15 +33,15 @@ extends CharacterBody2D
 
 @export_group("Jump")
 ## Max jump height
-@export var jump_height := 100
+@export var jump_height := 30
 ## Amount of time it takes the player to reach the peak of their jump
-@export var jump_time_to_peak := 0.4
+@export var jump_time_to_peak := 0.3
 ## Amount of time it takes the player to fall from the peak of their jump to the ground
 @export var jump_time_to_descent := 0.3
 ## Determains if a player jump highet changes depending on how long they held it in
 @export var variable_jump_height := false
 ## Determains the minumum jump heighet a player can reach if they barely tap the jump button (and variable_jump_height is true)
-@export var minimum_jump_height := -100
+@export var minimum_jump_height := -30
 
 @export_group("Jump Trojectory")
 ## Maximum amount of points used to visualize player's jump trojectory (WiP)

@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://c5txhug6yy62c"]
 
 [ext_resource type="Texture2D" uid="uid://coedxcct0r74f" path="res://Assets/Tiles/tile_0003.png" id="1_2kfsj"]
-[ext_resource type="Script" path="res://Scenes/Objects/moving_platform.gd" id="1_7tkll"]
+[ext_resource type="Script" uid="uid://bov5qldtkf8vw" path="res://Scenes/Objects/moving_platform.gd" id="1_7tkll"]
 [ext_resource type="Texture2D" uid="uid://bovvlujqfsjkv" path="res://Assets/Tiles/tile_0002.png" id="2_ml51d"]
 [ext_resource type="Texture2D" uid="uid://v3pmeaqo5v3" path="res://Assets/Tiles/tile_0001.png" id="3_0a0gp"]
 
@@ -39,8 +39,8 @@ tracks/0/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_3lvn2"]
 _data = {
-"RESET": SubResource("Animation_jj4db"),
-"move_platform": SubResource("Animation_2bl4e")
+&"RESET": SubResource("Animation_jj4db"),
+&"move_platform": SubResource("Animation_2bl4e")
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_a1rdh"]
