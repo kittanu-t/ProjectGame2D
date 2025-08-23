@@ -1,61 +1,84 @@
 extends CharacterBody2D
 
-# --- Exported tunable variables ---
-@export var MOVE_SPEED: float = 200.0
-@export var GRAVITY: float = 900.0
-@export var CHARGE_RATE: float = 400.0
-@export var MAX_JUMP_FORCE: float = 900.0
-@export var MIN_JUMP_FORCE: float = 300.0
-@export var AIR_CONTROL_FACTOR: float = 0.3
+# --- CONFIG ---
+@export var GRAVITY: float = 2000.0
+@export var CHARGE_RATE: float = 600.0          # ความเร็วในการชาร์จ
+@export var MAX_JUMP_FORCE: float = 650.0       # แรงกระโดดสูงสุด
+@export var MIN_JUMP_FORCE: float = 200.0       # แรงกระโดดต่ำสุด
+@export var MAX_HORIZONTAL_FORCE: float = 280.0 # ระยะกระโดดแนวนอนสูงสุด
+@export var WALL_BOUNCE_FORCE: float = 280.0    # แรงดีดออกจากกำแพง
+@export var WALL_BOUNCE_UP_FORCE: float = 350.0 # ดีดขึ้นเล็กน้อยตอนชนกำแพง
 
-# --- Internal state ---
-enum PlayerState { IDLE, MOVING, CHARGING, JUMPING }
-var state: PlayerState = PlayerState.IDLE
-var jump_charge: float = 0.0
+# --- STATE ---
+var jump_force: float = 0.0
+var is_charging: bool = false
+var is_jumping: bool = false
+var last_direction: int = 0 # -1 = ซ้าย, 1 = ขวา
+var move_speed: float = 280.0
 
 func _physics_process(delta: float) -> void:
-	# --- Apply gravity always ---
+	# Gravity
 	if not is_on_floor():
 		velocity.y += GRAVITY * delta
 
-	match state:
-		PlayerState.IDLE, PlayerState.MOVING:
-			handle_movement(delta)
+	# --- Input ---
+	var input_dir := Input.get_axis("Move_Left", "Move_Right")
+	if input_dir != 0:
+		last_direction = sign(input_dir)
 
-			# Start charging jump
-			if Input.is_action_just_pressed("Jump") and is_on_floor():
-				state = PlayerState.CHARGING
-				jump_charge = 0.0
+	# --- Charge Jump ---
 
-		PlayerState.CHARGING:
-			# Keep charging while button held
-			if Input.is_action_pressed("Jump"):
-				jump_charge += CHARGE_RATE * delta
-				jump_charge = min(jump_charge, MAX_JUMP_FORCE)
-			else:
-				# Release jump -> apply force
-				if is_on_floor():
-					velocity.y = -max(jump_charge, MIN_JUMP_FORCE)
-					state = PlayerState.JUMPING
-				jump_charge = 0.0
+	# เริ่มชาร์จเมื่อเพิ่งกด (just pressed) — หยุดการเคลื่อนที่ไว้ทันที
+	if Input.is_action_just_pressed("Jump") and is_on_floor():
+		is_charging = true
+		jump_force = 0.0                     # เริ่มสะสมจาก 0
+		# ถ้ากดทิศตอนเริ่ม ให้บันทึกทิศทันที
+		if input_dir != 0:
+			last_direction = int(sign(input_dir))
+		# หยุดแนวนอนทันทีเมื่อเริ่มชาร์จ
+		velocity.x = 0.0
 
-		PlayerState.JUMPING:
-			handle_air_control(delta)
-			if is_on_floor():
-				state = PlayerState.IDLE
+	# ขณะกดค้าง => เพิ่มชาร์จ และตรวจ auto-release (เมื่อเต็ม)
+	elif is_charging and Input.is_action_pressed("Jump"):
+		jump_force = clamp(jump_force + CHARGE_RATE * delta, 0.0, MAX_JUMP_FORCE)
 
+		# ถ้าชาร์จเต็ม ให้ auto-release (กระโดดเอง)
+		if jump_force >= MAX_JUMP_FORCE:
+			_do_jump_from_force()
+			is_charging = false
+			is_jumping = true
+
+	# ปล่อยปุ่มก่อนเต็ม => ปกติ release -> กระโดด
+	elif is_charging and Input.is_action_just_released("Jump"):
+		_do_jump_from_force()
+		is_charging = false
+		is_jumping = true
+
+
+	# --- Normal move (เดินบนพื้น) ---
+	if is_on_floor() and not is_charging:
+		velocity.x = input_dir * move_speed
+
+	# --- Wall Bounce ---
+	if is_jumping and is_on_wall() and abs(velocity.x) < 10:
+		velocity.x = -last_direction * WALL_BOUNCE_FORCE * 0.65
+		velocity.y = -WALL_BOUNCE_UP_FORCE 
+
+	# --- Move ---
 	move_and_slide()
 
+	# Reset jump state
+	if is_on_floor():
+		is_jumping = false
+func _do_jump_from_force() -> void:
+	# ปรับสเกลแกน X และ Y ให้ได้ฟีลที่คุณอยากได้
+	# แกน X ให้เล็กกว่าปกติ (เช่น 0.8) และแกน Y เพิ่มขึ้นเล็กน้อย (เช่น 1.12)
+	var t : float= clamp(jump_force / MAX_JUMP_FORCE, 0.0, 1.0)
+	var vx : float= lerp(0.0, MAX_HORIZONTAL_FORCE * 0.8, t) * last_direction    # X ลดเหลือ 80%
+	var vy : float= -max(MIN_JUMP_FORCE, jump_force) * 1.12                      # Y เพิ่ม ~12%
 
-func handle_movement(delta: float) -> void:
-	var input_dir = Input.get_axis("Move_Left", "Move_Right")
-	velocity.x = input_dir * MOVE_SPEED
-	if abs(input_dir) > 0:
-		state = PlayerState.MOVING
-	else:
-		state = PlayerState.IDLE
+	velocity.x = vx
+	velocity.y = vy
 
-
-func handle_air_control(delta: float) -> void:
-	var input_dir = Input.get_axis("Move_Left", "Move_Right")
-	velocity.x = lerp(velocity.x, input_dir * MOVE_SPEED, AIR_CONTROL_FACTOR * delta)
+	# รีเซ็ตค่าชาร์จ
+	jump_force = 0.0
