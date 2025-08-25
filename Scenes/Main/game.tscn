@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3 uid="uid://bawk0e64b3fak"]
+
+[ext_resource type="PackedScene" uid="uid://dqi7ekpwfx780" path="res://Scenes/Player/player.tscn" id="1_3q5hp"]
+[ext_resource type="Script" uid="uid://e4t7uvdhe0jc" path="res://Scenes/Main/CameraController.gd" id="1_h3ee8"]
+[ext_resource type="Script" uid="uid://bysf2vnbt5r2y" path="res://Scenes/Main/theme_manager.gd" id="2_fqiip"]
+
+[node name="Game" type="Node"]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(240, 240)
+script = ExtResource("1_h3ee8")
+
+[node name="Player" parent="." instance=ExtResource("1_3q5hp")]
+position = Vector2(240, 231)
+
+[node name="ThemeManager" type="Node" parent="."]
+script = ExtResource("2_fqiip")
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
