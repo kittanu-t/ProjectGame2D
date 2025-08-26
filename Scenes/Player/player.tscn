@@ -30,7 +30,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("3_xpcdj")
 }],
-"loop": false,
+"loop": true,
 "name": &"walk",
 "speed": 5.0
 }]
@@ -49,7 +49,7 @@ script = ExtResource("1_4w2it")
 position = Vector2(7.10543e-15, -3)
 scale = Vector2(0.75, 0.75)
 sprite_frames = SubResource("SpriteFrames_5h3j6")
-animation = &"idle"
+animation = &"fall"
 autoplay = "idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

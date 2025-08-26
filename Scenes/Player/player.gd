@@ -6,7 +6,7 @@ extends CharacterBody2D
 @export var CHARGE_RATE: float = 600.0
 @export var MAX_JUMP_FORCE: float = 650.0
 @export var MIN_JUMP_FORCE: float = 200.0
-@export var MAX_HORIZONTAL_FORCE: float = 280.0
+@export var MAX_HORIZONTAL_FORCE: float = 320.0
 @export var WALL_BOUNCE_FORCE: float = 280.0
 @export var WALL_BOUNCE_UP_FORCE: float = 350.0
 @export var FALL_DAMAGE_HEIGHT: float = 490
@@ -16,7 +16,7 @@ signal change_camera_pos(new_camera_y: float)
 
 var jump_force: float = 0.0
 var last_direction: int = 1
-var move_speed: float = 280.0
+var move_speed: float = 180.0
 var is_charging: bool = false
 var is_jumping: bool = false
 var is_fallen: bool = false
