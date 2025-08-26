@@ -1,13 +1,17 @@
-[gd_scene load_steps=6 format=3 uid="uid://dqi7ekpwfx780"]
+[gd_scene load_steps=7 format=3 uid="uid://dqi7ekpwfx780"]
 
 [ext_resource type="Script" uid="uid://ba5etum7env8l" path="res://Scenes/Player/player.gd" id="1_4w2it"]
+[ext_resource type="Texture2D" uid="uid://8k2mlyw47y0n" path="res://Assets/Characters/fall.png" id="2_mtuoh"]
 [ext_resource type="Texture2D" uid="uid://dkuym32hpyla4" path="res://Assets/Characters/idel (2).png" id="3_mtuoh"]
 [ext_resource type="Texture2D" uid="uid://b1sjhlfmooi3q" path="res://Assets/Characters/walk.png" id="3_xpcdj"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_5h3j6"]
 animations = [{
-"frames": [],
-"loop": true,
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_mtuoh")
+}],
+"loop": false,
 "name": &"fall",
 "speed": 5.0
 }, {
@@ -26,7 +30,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("3_xpcdj")
 }],
-"loop": true,
+"loop": false,
 "name": &"walk",
 "speed": 5.0
 }]
@@ -46,6 +50,7 @@ position = Vector2(7.10543e-15, -3)
 scale = Vector2(0.75, 0.75)
 sprite_frames = SubResource("SpriteFrames_5h3j6")
 animation = &"idle"
+autoplay = "idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -3)
