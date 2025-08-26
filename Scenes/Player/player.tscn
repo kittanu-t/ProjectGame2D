@@ -6,6 +6,11 @@
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_5h3j6"]
 animations = [{
+"frames": [],
+"loop": true,
+"name": &"fall",
+"speed": 5.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": ExtResource("3_mtuoh")
@@ -40,7 +45,7 @@ script = ExtResource("1_4w2it")
 position = Vector2(7.10543e-15, -3)
 scale = Vector2(0.75, 0.75)
 sprite_frames = SubResource("SpriteFrames_5h3j6")
-animation = &"walk"
+animation = &"idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -3)

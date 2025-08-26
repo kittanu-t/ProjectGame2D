@@ -2,7 +2,7 @@
 extends Node2D
 
 @onready var player: CharacterBody2D = $Player
-@onready var camera: Camera2D = $Camera2D
+@onready var camera: Camera2D = $camera2d
 @onready var spawn_point: Marker2D = $SpawnPoint
 
 func _ready() -> void:
@@ -18,4 +18,4 @@ func _ready() -> void:
 
 func _on_player_change_camera_pos(new_camera_y: float) -> void:
 	# - RE-ADDED -# ฟังก์ชันสำหรับขยับกล้องเมื่อได้รับสัญญาณ
-	$Camera2D.position.y = new_camera_y
+	camera.position.y = new_camera_y
