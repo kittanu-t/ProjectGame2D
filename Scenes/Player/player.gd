@@ -13,6 +13,7 @@ extends CharacterBody2D
 @export var room_height: int = 480
 
 signal change_camera_pos(new_camera_y: float)
+signal sfx_play(name: String)  # <-- เพิ่ม signal สำหรับให้ Main เล่น SFX
 
 var jump_force: float = 0.0
 var last_direction: int = 1
@@ -52,11 +53,14 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("Jump") and is_on_floor():
 		is_charging = true
 		jump_force = 0.0
+		# แจ้งให้เล่นเสียงเริ่มชาร์จ
+		emit_signal("sfx_play", "charge_start")
 		if input_dir != 0:
 			last_direction = int(sign(input_dir))
 		velocity.x = 0.0
 	elif is_charging and Input.is_action_pressed("Jump"):
 		jump_force = clamp(jump_force + CHARGE_RATE * delta, 0.0, MAX_JUMP_FORCE)
+		# ถ้าต้องการเสียงชาร์จ loop แยก สามารถเรียกเมื่อถึง thresholds
 		if jump_force >= MAX_JUMP_FORCE:
 			_do_jump()
 	elif is_charging and Input.is_action_just_released("Jump"):
@@ -65,38 +69,41 @@ func _physics_process(delta: float) -> void:
 	if is_on_floor() and not is_charging:
 		velocity.x = input_dir * move_speed
 
-	# --- Wall Bounce Logic (เหมือนเดิม) ---
+	# --- Wall Bounce Logic (fallback เมื่อ velocity.x == 0) ---
 	if is_jumping and is_on_wall() and not _has_bounced_since_airborne:
 		_has_bounced_since_airborne = true
-		var bounce_strength = abs(velocity.x) * 0.5 + WALL_BOUNCE_FORCE * 0.2
-		velocity.x = -sign(velocity.x) * min(bounce_strength, WALL_BOUNCE_FORCE) * 1.15
+		var horiz := velocity.x
+		if abs(horiz) < 1.0:
+			horiz = last_direction * move_speed
+		var bounce_strength : float = abs(horiz) * 0.5 + WALL_BOUNCE_FORCE * 0.2
+		var dir : float = -sign(horiz)
+		if dir == 0:
+			dir = -last_direction
+		velocity.x = dir * min(bounce_strength, WALL_BOUNCE_FORCE) * 1.15
 		velocity.y = -WALL_BOUNCE_UP_FORCE
+		# แจ้งให้เล่นเสียงเด้งผนัง
+		emit_signal("sfx_play", "wall_bounce")
 	
 	# --- Move ---
-	# - MODIFIED -# เก็บค่า is_on_floor() "ก่อน" ที่จะ move
 	_was_on_floor = is_on_floor()
 	move_and_slide()
 	
-	# --- MODIFIED: ย้าย Logic การเช็คสถานะพื้นมาไว้ "หลัง" move_and_slide ---
+	# --- หลัง move_and_slide: ตรวจการตก/ลงพื้น ---
 	var is_currently_on_floor = is_on_floor()
-	
-	# เช็ค "ตอนเริ่มตก"
 	if _was_on_floor and not is_currently_on_floor:
-		_fall_start_y = global_position.y # บันทึกตำแหน่ง Y ตอนเริ่มตก
-	
-	# เช็ค "ตอนตกถึงพื้น"
+		_fall_start_y = global_position.y
 	if not _was_on_floor and is_currently_on_floor:
-		_check_fall_damage() # ตรวจสอบความเสียหายจากการตก
+		_check_fall_damage()
 		is_jumping = false
 		_has_bounced_since_airborne = false
 
-	# --- Camera Snap Logic (เหมือนเดิม) ---
+	# --- Camera Snap Logic ---
 	var new_room = int(floor(global_position.y / room_height))
 	if new_room != _current_room:
 		_current_room = new_room
 		emit_signal("change_camera_pos", _room_center_y(_current_room))
 
-# --- (ฟังก์ชัน _do_jump, _check_fall_damage, _room_center_y เหมือนเดิม) ---
+# --- (ฟังก์ชัน _do_jump, _check_fall_damage, _room_center_y เหมือนเดิม แต่เพิ่ม emit sfx) ---
 func _do_jump() -> void:
 	var t: float = clamp(jump_force / MAX_JUMP_FORCE, 0.0, 1.0)
 	var vx: float = lerp(0.0, MAX_HORIZONTAL_FORCE, t) * last_direction
@@ -106,13 +113,16 @@ func _do_jump() -> void:
 	jump_force = 0.0
 	is_charging = false
 	is_jumping = true
+	# แจ้งให้เล่นเสียงกระโดด
+	emit_signal("sfx_play", "jump")
 
 func _check_fall_damage() -> void:
 	var fall_distance = global_position.y - _fall_start_y
-	#print("Landed! Fall distance: ", fall_distance, " / Required: ", FALL_DAMAGE_HEIGHT)
 	if fall_distance >= FALL_DAMAGE_HEIGHT:
 		is_fallen = true
 		$AnimatedSprite2D.play("fall")
+		# แจ้งให้เล่นเสียงตก (fall state)
+		emit_signal("sfx_play", "fall")
 
 func _room_center_y(room_index: int) -> float:
 	return float(room_index) * room_height + room_height * 0.5

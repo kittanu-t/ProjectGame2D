@@ -1,0 +1,34 @@
+[gd_scene load_steps=2 format=3 uid="uid://bvajytrmtkn55"]
+
+[ext_resource type="Script" uid="uid://dbhvbxwl5m3ie" path="res://Scenes/Main/finish.gd" id="1_clgeh"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_clgeh")
+
+[node name="Title" type="Label" parent="."]
+offset_left = 208.0
+offset_top = 59.0
+offset_right = 248.0
+offset_bottom = 82.0
+text = "Jump King"
+
+[node name="TimeLabel" type="Label" parent="."]
+offset_left = 222.0
+offset_top = 109.0
+offset_right = 262.0
+offset_bottom = 132.0
+
+[node name="BestLabel" type="Label" parent="."]
+offset_left = 228.0
+offset_top = 179.0
+offset_right = 268.0
+offset_bottom = 202.0
+
+[node name="Back to Menu" type="VBoxContainer" parent="."]
+offset_left = 218.0
+offset_top = 238.0
+offset_right = 258.0
+offset_bottom = 278.0
+alignment = 1
