@@ -1,4 +1,4 @@
-# Main.gd
+# Main.gd (DEBUG VERSION)
 extends Node2D
 
 @onready var player: CharacterBody2D = $Player
@@ -8,9 +8,19 @@ extends Node2D
 @onready var bgm_player: AudioStreamPlayer = $bgm_player
 @onready var sfx_player: AudioStreamPlayer = $sfx_player
 
-# --- BGM / SFX resources (set these in Inspector on Main node) ---
+# --- DEBUG toggles ---
+@export var DEBUG_BGM: bool = true                 # เปิด log ระบบ BGM
+@export var DEBUG_BGM_POLL: bool = false           # โพลล์ room ทุกเฟรมแล้วเรียกสลับ BGM (ใช้เพื่อเทสแม้ยังไม่ต่อสัญญาณ)
+var __dbg_last_room: int = -999999
+
+# --- BGM / SFX resources ---
 @export var bgm_room0: AudioStream
 @export var bgm_room1: AudioStream
+@export var bgm_room2: AudioStream
+@export var bgm_room3: AudioStream
+@export var bgm_room4: AudioStream
+@export var bgm_room5: AudioStream
+@export var bgm_room6: AudioStream
 
 @export var sfx_charge_start: AudioStream
 @export var sfx_jump: AudioStream
@@ -35,18 +45,25 @@ func _ready() -> void:
 	var room_index := int(floor(player.global_position.y / player.room_height))
 	camera.position.y = float(room_index) * player.room_height + player.room_height * 0.5
 
-	# เชื่อมต่อสัญญาณจาก Player
-	#player.connect("change_camera_pos", Callable(self, "_on_player_change_camera_pos"))
-	player.connect("sfx_play", Callable(self, "_on_player_sfx"))
+	if DEBUG_BGM:
+		print("[BGM] _ready(): spawn_room=", room_index, " player_y=", player.global_position.y, " room_h=", player.room_height)
+		# แจ้งเตือนถ้ายังไม่เชื่อมสัญญาณ change_camera_pos (จะทำให้ BGM ไม่สลับตอนย้ายห้อง)
+		if not player.is_connected("change_camera_pos", Callable(self, "_on_player_change_camera_pos")):
+			print("[BGM][WARN] player.change_camera_pos NOT connected -> _on_player_change_camera_pos (BGM จะไม่สลับเมื่อย้ายห้อง)")
+		print(_dbg_streams_status())
 
-	# เชื่อมต่อ GoalArea
-	#goal_area.body_entered.connect(Callable(self, "_on_goal_entered"))
+	# เชื่อมต่อสัญญาณจาก Player (ของเดิมคุณคอมเมนต์ไว้)
+	# player.connect("change_camera_pos", Callable(self, "_on_player_change_camera_pos"))
 
-	# เริ่มจับเวลาเมื่อ scene พร้อมเล่นเลย (ถ้าต้องการเริ่มเมื่อ input แรก ให้แก้เป็น trigger)
+	# เชื่อมต่อ GoalArea (ของเดิมคุณคอมเมนต์ไว้)
+	# goal_area.body_entered.connect(Callable(self, "_on_goal_entered"))
+
+	# เริ่มจับเวลาเมื่อ scene พร้อมเล่นเลย
 	start_game_timer()
 
 	# start initial bgm based on spawn room
 	_switch_bgm_by_room(room_index)
+	__dbg_last_room = room_index
 
 func start_game_timer() -> void:
 	elapsed_time = 0.0
@@ -59,19 +76,80 @@ func _process(delta: float) -> void:
 	if timer_running:
 		elapsed_time += delta
 
+	# โหมดโพลล์เพื่อ debug (ไม่ต้องพึ่ง signal)
+	if DEBUG_BGM_POLL:
+		var room_index := int(floor(player.global_position.y / player.room_height))
+		if room_index != __dbg_last_room:
+			if DEBUG_BGM:
+				print("[BGM][POLL] room changed -> ", room_index, " (from ", __dbg_last_room, ") y=", player.global_position.y)
+			__dbg_last_room = room_index
+			_switch_bgm_by_room(room_index)
+
 func _on_player_change_camera_pos(new_camera_y: float) -> void:
 	camera.position.y = new_camera_y
-	# switch bgm if necessary
 	var room_index := int(floor(new_camera_y / player.room_height))
+	if DEBUG_BGM:
+		print("[BGM] _on_player_change_camera_pos: new_cam_y=", new_camera_y, " -> room=", room_index)
 	_switch_bgm_by_room(room_index)
 
+# ------------------ DEBUGGED: pick among 7 BGM by room index ------------------
 func _switch_bgm_by_room(room_index: int) -> void:
-	var desired: AudioStream = bgm_room0 if room_index <= 0 else bgm_room1
-	if desired and bgm_player.stream != desired:
+	var streams: Array[AudioStream] = [
+		bgm_room0, bgm_room1, bgm_room2, bgm_room3, bgm_room4, bgm_room5, bgm_room6
+	]
+	if streams.is_empty():
+		if DEBUG_BGM:
+			print("[BGM][ERR] No streams array (empty)!")
+		return
+
+	var idx: int = clamp(room_index, 0, streams.size() - 1)
+	var desired: AudioStream = streams[idx]
+
+	if DEBUG_BGM:
+		print("[BGM] switch request: room=", room_index, " -> idx=", idx,
+			  " desired=", _dbg_stream_label(desired),
+			  " current=", _dbg_stream_label(bgm_player.stream))
+
+	if desired == null:
+		if DEBUG_BGM:
+			print("[BGM][WARN] Desired stream is NULL at idx=", idx, " (ยังไม่ได้ตั้งค่าใน Inspector?)")
+		return
+
+	# เปลี่ยนเฉพาะเมื่อแตกต่างจริง
+	if bgm_player.stream != desired:
 		bgm_player.stream = desired
 		bgm_player.play()
-		
-# Player SFX handler (Main plays SFX)
+		if DEBUG_BGM:
+			print("[BGM] now playing: ", _dbg_stream_label(bgm_player.stream))
+	else:
+		if DEBUG_BGM:
+			print("[BGM] already playing desired stream; no change")
+
+# Debug helpers ---------------------------------------------------------------
+func _dbg_stream_label(s: AudioStream) -> String:
+	if s == null:
+		return "null"
+	# Resource มี resource_path เมื่อเป็นไฟล์ที่ import เข้าโครงการ
+	if s.resource_path != "":
+		return s.resource_path
+	# ถ้าไม่มี path ลองใช้ชื่อ class เป็น label
+	return "[" + s.get_class() + "]"
+
+func _dbg_streams_status() -> String:
+	var arr := [
+		"bgm_room0=" + _dbg_stream_label(bgm_room0),
+		"bgm_room1=" + _dbg_stream_label(bgm_room1),
+		"bgm_room2=" + _dbg_stream_label(bgm_room2),
+		"bgm_room3=" + _dbg_stream_label(bgm_room3),
+		"bgm_room4=" + _dbg_stream_label(bgm_room4),
+		"bgm_room5=" + _dbg_stream_label(bgm_room5),
+		"bgm_room6=" + _dbg_stream_label(bgm_room6),
+	]
+	return "[BGM] streams: " + ", ".join(arr)
+# -----------------------------------------------------------------------------
+
+
+# ------------------ SFX ------------------
 func _on_player_sfx(name: String) -> void:
 	match name:
 		"charge_start":
@@ -83,7 +161,6 @@ func _on_player_sfx(name: String) -> void:
 		"fall":
 			_play_sfx(sfx_fall)
 		_:
-			# unknown -> no-op
 			pass
 
 func _play_sfx(stream: AudioStream) -> void:
@@ -95,17 +172,13 @@ func _play_sfx(stream: AudioStream) -> void:
 func _on_goal_entered(body: Node) -> void:
 	if body == player and timer_running:
 		stop_game_timer()
-		# save last_time and maybe best_time
 		var best := _load_best_time()
 		var is_new_record := false
 		if best < 0.0 or elapsed_time < best:
 			_save_best_time(elapsed_time)
 			is_new_record = true
-		# save last time
 		_save_last_time(elapsed_time)
-		# save last coins
 		_save_last_coins(coins_collected)
-		# เปลี่ยน scene แบบ deferred เพื่อหลีกเลี่ยง physics-callback restrictions
 		call_deferred("_go_to_finish_scene")
 
 func _go_to_finish_scene() -> void:
@@ -119,7 +192,7 @@ func on_coin_collected(amount: int = 1) -> void:
 # ------------------ Save / Load ------------------
 func _save_best_time(time_sec: float) -> void:
 	var cfg := ConfigFile.new()
-	cfg.load("user://save.cfg") # ignore errors
+	cfg.load("user://save.cfg")
 	cfg.set_value("records", "best_time", time_sec)
 	cfg.save("user://save.cfg")
 

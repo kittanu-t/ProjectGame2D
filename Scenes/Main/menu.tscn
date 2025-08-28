@@ -1,11 +1,15 @@
-[gd_scene load_steps=2 format=3 uid="uid://7qikpv7745st"]
+[gd_scene load_steps=4 format=3 uid="uid://7qikpv7745st"]
 
 [ext_resource type="Script" uid="uid://b5ex24qufir2d" path="res://Scenes/Main/menu.gd" id="1_xlylt"]
+[ext_resource type="AudioStream" uid="uid://y1kffkwahg63" path="res://Assets/Sound/blipSelect.wav" id="2_at7h2"]
+[ext_resource type="AudioStream" uid="uid://ccokuqflbx7cm" path="res://Assets/Sound/comfirm.wav" id="3_d8a7c"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_xlylt")
+sound_move = ExtResource("2_at7h2")
+sound_confirm = ExtResource("3_d8a7c")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 0
@@ -25,3 +29,4 @@ text = "Exit"
 layout_mode = 2
 
 [node name="SFXPlayer" type="AudioStreamPlayer" parent="."]
+volume_db = -11.005

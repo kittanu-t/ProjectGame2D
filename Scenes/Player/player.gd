@@ -22,7 +22,7 @@ signal sfx_play(name: String)  # <-- เพิ่ม signal สำหรับ�
 
 var jump_force: float = 0.0
 var last_direction: int = 1
-var move_speed: float = 150.0
+var move_speed: float = 120.0
 var is_charging: bool = false
 var is_jumping: bool = false
 var is_fallen: bool = false

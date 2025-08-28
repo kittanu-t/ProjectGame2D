@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="2D Platformer Template"
-run/main_scene="res://Scenes/Main/main.tscn"
+run/main_scene="uid://7qikpv7745st"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
 
