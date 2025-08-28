@@ -18,15 +18,16 @@ extends Node2D
 @export var sfx_fall: AudioStream
 @export var sfx_menu_move: AudioStream
 @export var sfx_menu_confirm: AudioStream
+@export var sfx_coin: AudioStream
 
 # Timer / score
 var elapsed_time: float = 0.0
 var timer_running: bool = false
 
+# Coins
+var coins_collected: int = 0
+
 func _ready() -> void:
-	var cfg = ConfigFile.new()      # สร้าง object ใน function
-	cfg.set_value("records", "best_time", 123.45)
-	cfg.save("user://save.cfg")     # จะสร้างไฟล์ save.cfg ให้เอง
 	# วางผู้เล่นที่จุดเกิดเริ่มต้น
 	player.global_position = spawn_point.global_position
 
@@ -90,7 +91,7 @@ func _play_sfx(stream: AudioStream) -> void:
 		sfx_player.stream = stream
 		sfx_player.play()
 
-# Goal reached
+# ------------------ Goal reached ------------------
 func _on_goal_entered(body: Node) -> void:
 	if body == player and timer_running:
 		stop_game_timer()
@@ -102,11 +103,18 @@ func _on_goal_entered(body: Node) -> void:
 			is_new_record = true
 		# save last time
 		_save_last_time(elapsed_time)
-		# เปลี่ยน scene แบบ deferred
+		# save last coins
+		_save_last_coins(coins_collected)
+		# เปลี่ยน scene แบบ deferred เพื่อหลีกเลี่ยง physics-callback restrictions
 		call_deferred("_go_to_finish_scene")
 
 func _go_to_finish_scene() -> void:
 	get_tree().change_scene_to_file("res://Scenes/Main/finish.tscn")
+
+# ------------------ Coins ------------------
+func on_coin_collected(amount: int = 1) -> void:
+	coins_collected += amount
+	_play_sfx(sfx_coin)
 
 # ------------------ Save / Load ------------------
 func _save_best_time(time_sec: float) -> void:
@@ -133,15 +141,8 @@ func _load_last_time() -> float:
 		return float(cfg.get_value("records", "last_time", -1.0))
 	return -1.0
 
-
-func save_best_time(time_sec: float) -> void:
-	var cfg = ConfigFile.new()
-	cfg.load("user://save.cfg")         # โหลดก่อน ถ้ามี
-	cfg.set_value("records", "best_time", time_sec)
+func _save_last_coins(n:int) -> void:
+	var cfg := ConfigFile.new()
+	cfg.load("user://save.cfg")
+	cfg.set_value("records", "last_coins", n)
 	cfg.save("user://save.cfg")
-
-func load_best_time() -> float:
-	var cfg = ConfigFile.new()
-	if cfg.load("user://save.cfg") == OK:
-		return float(cfg.get_value("records", "best_time", -1.0))
-	return -1.0

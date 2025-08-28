@@ -8,6 +8,7 @@ anchors_preset = 0
 script = ExtResource("1_clgeh")
 
 [node name="Title" type="Label" parent="."]
+layout_mode = 0
 offset_left = 208.0
 offset_top = 59.0
 offset_right = 248.0
@@ -15,20 +16,39 @@ offset_bottom = 82.0
 text = "Jump King"
 
 [node name="TimeLabel" type="Label" parent="."]
+layout_mode = 0
 offset_left = 222.0
 offset_top = 109.0
 offset_right = 262.0
 offset_bottom = 132.0
 
 [node name="BestLabel" type="Label" parent="."]
+layout_mode = 0
 offset_left = 228.0
 offset_top = 179.0
 offset_right = 268.0
 offset_bottom = 202.0
 
-[node name="Back to Menu" type="VBoxContainer" parent="."]
+[node name="CoinsLabel" type="Label" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="Button" type="VBoxContainer" parent="."]
+layout_mode = 0
 offset_left = 218.0
 offset_top = 238.0
 offset_right = 258.0
 offset_bottom = 278.0
 alignment = 1
+
+[node name="Back to Menu" type="Button" parent="Button"]
+layout_mode = 2
+text = "Back to Menu"
+
+[node name="Retry" type="Button" parent="Button"]
+layout_mode = 2
+text = "Retry"
+
+[connection signal="pressed" from="Button/Back to Menu" to="." method="_on_btn_menu_pressed"]
+[connection signal="pressed" from="Button/Retry" to="." method="_on_btn_retry_pressed"]

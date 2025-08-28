@@ -12,6 +12,11 @@ extends CharacterBody2D
 @export var FALL_DAMAGE_HEIGHT: float = 490
 @export var room_height: int = 480
 
+# --- ICE tuning (export เพื่อจูนใน Inspector) ---
+@export var ICE_ACCEL: float = 2
+@export var ICE_FRICTION_DECAY: float = 0.1
+
+
 signal change_camera_pos(new_camera_y: float)
 signal sfx_play(name: String)  # <-- เพิ่ม signal สำหรับให้ Main เล่น SFX
 
@@ -25,6 +30,10 @@ var _fall_start_y: float = 0.0
 var _has_bounced_since_airborne: bool = false
 var _current_room: int = 0
 var _was_on_floor: bool = true # เริ่มต้นให้เป็น true
+
+# ICE / WIND state
+var _on_ice: bool = false
+var _accum_wind: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
 	await get_tree().process_frame
@@ -60,14 +69,21 @@ func _physics_process(delta: float) -> void:
 		velocity.x = 0.0
 	elif is_charging and Input.is_action_pressed("Jump"):
 		jump_force = clamp(jump_force + CHARGE_RATE * delta, 0.0, MAX_JUMP_FORCE)
-		# ถ้าต้องการเสียงชาร์จ loop แยก สามารถเรียกเมื่อถึง thresholds
 		if jump_force >= MAX_JUMP_FORCE:
 			_do_jump()
 	elif is_charging and Input.is_action_just_released("Jump"):
 		_do_jump()
 		
+	# --- Movement on floor (รองรับ ice) ---
 	if is_on_floor() and not is_charging:
-		velocity.x = input_dir * move_speed
+		if _on_ice:
+			# ลื่น: ค่อยๆ เลื่อนไปหาค่า target (lerp) และค่อยๆ หยุดเมื่อไม่มี input
+			var target := input_dir * move_speed
+			velocity.x = lerp(velocity.x, target, clamp(ICE_ACCEL * delta, 0.0, 1.0))
+			if input_dir == 0:
+				velocity.x = lerp(velocity.x, 0.0, clamp(ICE_FRICTION_DECAY * delta, 0.0, 1.0))
+		else:
+			velocity.x = input_dir * move_speed
 
 	# --- Wall Bounce Logic (fallback เมื่อ velocity.x == 0) ---
 	if is_jumping and is_on_wall() and not _has_bounced_since_airborne:
@@ -84,6 +100,11 @@ func _physics_process(delta: float) -> void:
 		# แจ้งให้เล่นเสียงเด้งผนัง
 		emit_signal("sfx_play", "wall_bounce")
 	
+	# --- Apply accumulated wind BEFORE move_and_slide ---
+	if _accum_wind != Vector2.ZERO:
+		velocity += _accum_wind
+		_accum_wind = Vector2.ZERO
+
 	# --- Move ---
 	_was_on_floor = is_on_floor()
 	move_and_slide()
@@ -126,3 +147,10 @@ func _check_fall_damage() -> void:
 
 func _room_center_y(room_index: int) -> float:
 	return float(room_index) * room_height + room_height * 0.5
+
+# --- Methods for external Areas (Ice / Wind) ---
+func set_on_ice(value: bool) -> void:
+	_on_ice = value
+
+func apply_wind(force: Vector2) -> void:
+	_accum_wind += force
