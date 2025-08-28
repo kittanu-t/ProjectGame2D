@@ -14,7 +14,7 @@ func _ready() -> void:
 	_update_selection()
 	_show_best_time()
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("menu_up"):
 		idx = (idx - 1) % items.size()
 		_update_selection()

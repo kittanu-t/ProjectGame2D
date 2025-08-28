@@ -11,6 +11,7 @@ extends CharacterBody2D
 @export var WALL_BOUNCE_UP_FORCE: float = 350.0
 @export var FALL_DAMAGE_HEIGHT: float = 490
 @export var room_height: int = 480
+@onready var _sprite: AnimatedSprite2D = $AnimatedSprite2D
 
 # --- ICE tuning (export เพื่อจูนใน Inspector) ---
 @export var ICE_ACCEL: float = 2
@@ -58,7 +59,10 @@ func _physics_process(delta: float) -> void:
 	var input_dir := Input.get_axis("Move_Left", "Move_Right")
 	if input_dir != 0:
 		last_direction = int(sign(input_dir))
-
+		
+	if input_dir != 0:
+		_sprite.flip_h = input_dir < 0
+	
 	if Input.is_action_just_pressed("Jump") and is_on_floor():
 		is_charging = true
 		jump_force = 0.0
@@ -123,6 +127,11 @@ func _physics_process(delta: float) -> void:
 	if new_room != _current_room:
 		_current_room = new_room
 		emit_signal("change_camera_pos", _room_center_y(_current_room))
+	
+	# ถ้าไม่มี input แต่ตัวละครเคลื่อนจากแรงอื่น (เด้งผนัง/ลม/ไอซ์) ให้หันตามทิศการเคลื่อน
+	if input_dir == 0 and abs(velocity.x) > 1.0:
+		_sprite.flip_h = velocity.x < 0
+
 
 # --- (ฟังก์ชัน _do_jump, _check_fall_damage, _room_center_y เหมือนเดิม แต่เพิ่ม emit sfx) ---
 func _do_jump() -> void:
