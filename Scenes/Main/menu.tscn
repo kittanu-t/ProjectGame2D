@@ -1,17 +1,17 @@
-[gd_scene load_steps=10 format=3 uid="uid://7qikpv7745st"]
+[gd_scene load_steps=11 format=3 uid="uid://7qikpv7745st"]
 
 [ext_resource type="Script" uid="uid://b5ex24qufir2d" path="res://Scenes/Main/menu.gd" id="1_xlylt"]
 [ext_resource type="AudioStream" uid="uid://y1kffkwahg63" path="res://Assets/Sound/blipSelect.wav" id="2_at7h2"]
 [ext_resource type="AudioStream" uid="uid://ccokuqflbx7cm" path="res://Assets/Sound/comfirm.wav" id="3_d8a7c"]
 [ext_resource type="Texture2D" uid="uid://c8iac24bhx74d" path="res://Assets/Background/openart-image_uVgBtFXd_1756658038619_raw.jpg" id="4_lvtde"]
+[ext_resource type="FontFile" uid="uid://brfx68hauj4bb" path="res://Assets/Background/PressStart2P-Regular.ttf" id="5_2is5t"]
+[ext_resource type="Texture2D" uid="uid://cissyqu6rb0pb" path="res://Assets/Background/Image_1_..png" id="5_sfn1q"]
 [ext_resource type="Texture2D" uid="uid://d1ll6pxhdocgi" path="res://Assets/Background/JK (10).png" id="5_tgm16"]
 [ext_resource type="Texture2D" uid="uid://cniosb63oo0g1" path="res://Assets/Background/JK (11).png" id="6_2is5t"]
 [ext_resource type="Texture2D" uid="uid://bgqfbln51pui7" path="res://Assets/Background/JK (13).png" id="7_tgm16"]
 
-[sub_resource type="SystemFont" id="SystemFont_tgm16"]
-
-[sub_resource type="LabelSettings" id="LabelSettings_sfn1q"]
-font = SubResource("SystemFont_tgm16")
+[sub_resource type="LabelSettings" id="LabelSettings_2is5t"]
+font = ExtResource("5_2is5t")
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -43,7 +43,7 @@ text = "Exit"
 
 [node name="BestTime" type="Label" parent="VBoxContainer"]
 layout_mode = 2
-label_settings = SubResource("LabelSettings_sfn1q")
+label_settings = SubResource("LabelSettings_2is5t")
 
 [node name="SFXPlayer" type="AudioStreamPlayer" parent="."]
 volume_db = -11.005
@@ -68,6 +68,12 @@ texture_normal = ExtResource("6_2is5t")
 position = Vector2(255, 217)
 scale = Vector2(0.499562, 0.279083)
 texture = ExtResource("7_tgm16")
+
+[node name="Image1_" type="Sprite2D" parent="."]
+position = Vector2(121, 339)
+scale = Vector2(0.290739, 0.228125)
+texture = ExtResource("5_sfn1q")
+flip_h = true
 
 [connection signal="pressed" from="Start" to="." method="_on_start_pressed"]
 [connection signal="pressed" from="Exit" to="." method="_on_exit_pressed"]
