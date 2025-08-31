@@ -1,54 +1,91 @@
-[gd_scene load_steps=2 format=3 uid="uid://bvajytrmtkn55"]
+[gd_scene load_steps=10 format=3 uid="uid://bvajytrmtkn55"]
 
 [ext_resource type="Script" uid="uid://dbhvbxwl5m3ie" path="res://Scenes/Main/finish.gd" id="1_clgeh"]
+[ext_resource type="Texture2D" uid="uid://b15w7fihq1mly" path="res://Assets/Background/castle002.jpg" id="2_j8k7r"]
+[ext_resource type="Texture2D" uid="uid://cwu3rshjkljc0" path="res://Assets/Background/ลุงโดด.png" id="3_248b2"]
+[ext_resource type="Texture2D" uid="uid://baydq5p5s78ql" path="res://Assets/Background/Back to menu.png" id="3_5336s"]
+[ext_resource type="FontFile" uid="uid://brfx68hauj4bb" path="res://Assets/Background/PressStart2P-Regular.ttf" id="4_3ugbx"]
+[ext_resource type="Texture2D" uid="uid://jgtm2h6bf0if" path="res://Assets/Background/Retry.png" id="4_248b2"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_c2apk"]
+font = ExtResource("4_3ugbx")
+
+[sub_resource type="LabelSettings" id="LabelSettings_3ugbx"]
+font = ExtResource("4_3ugbx")
+
+[sub_resource type="LabelSettings" id="LabelSettings_evj2f"]
+font = ExtResource("4_3ugbx")
 
 [node name="Control" type="Control"]
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_clgeh")
 
-[node name="Title" type="Label" parent="."]
+[node name="Background" type="TextureRect" parent="."]
 layout_mode = 0
-offset_left = 208.0
-offset_top = 59.0
-offset_right = 248.0
-offset_bottom = 82.0
-text = "Jump King"
+offset_left = -104.0
+offset_top = -7.0
+offset_right = 508.0
+offset_bottom = 605.0
+texture = ExtResource("2_j8k7r")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Title" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 110.0
+offset_top = -1.0
+offset_right = 371.0
+offset_bottom = 308.0
+texture = ExtResource("3_248b2")
+expand_mode = 1
 
 [node name="TimeLabel" type="Label" parent="."]
 layout_mode = 0
-offset_left = 222.0
-offset_top = 109.0
-offset_right = 262.0
-offset_bottom = 132.0
+offset_left = 135.0
+offset_top = 155.0
+offset_right = 175.0
+offset_bottom = 178.0
+label_settings = SubResource("LabelSettings_c2apk")
 
 [node name="BestLabel" type="Label" parent="."]
 layout_mode = 0
-offset_left = 228.0
-offset_top = 179.0
-offset_right = 268.0
-offset_bottom = 202.0
+offset_left = 135.0
+offset_top = 193.0
+offset_right = 175.0
+offset_bottom = 216.0
+label_settings = SubResource("LabelSettings_3ugbx")
 
 [node name="CoinsLabel" type="Label" parent="."]
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 23.0
+label_settings = SubResource("LabelSettings_evj2f")
 
 [node name="Button" type="VBoxContainer" parent="."]
 layout_mode = 0
-offset_left = 218.0
-offset_top = 238.0
-offset_right = 258.0
-offset_bottom = 278.0
+offset_left = 189.0
+offset_top = 236.0
+offset_right = 309.0
+offset_bottom = 356.0
 alignment = 1
 
-[node name="Back to Menu" type="Button" parent="Button"]
+[node name="Back to Menu" type="TextureButton" parent="Button"]
 layout_mode = 2
-text = "Back to Menu"
+texture_normal = ExtResource("3_5336s")
 
-[node name="Retry" type="Button" parent="Button"]
+[node name="Button2" type="Button" parent="."]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
+
+[node name="Retry" type="TextureButton" parent="Button2"]
 layout_mode = 2
-text = "Retry"
+offset_left = 188.0
+offset_top = 312.0
+offset_right = 308.0
+offset_bottom = 432.0
+texture_normal = ExtResource("4_248b2")
 
 [connection signal="pressed" from="Button/Back to Menu" to="." method="_on_btn_menu_pressed"]
-[connection signal="pressed" from="Button/Retry" to="." method="_on_btn_retry_pressed"]
+[connection signal="pressed" from="Button2/Retry" to="." method="_on_btn_retry_pressed"]
