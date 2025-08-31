@@ -69,3 +69,11 @@ func _format_time(t: float) -> String:
 	
 	# Corrected lines using lpad()
 	return str(mins).lpad(2, '0') + ":" + str(secs).lpad(2, '0') + "." + str(ms).lpad(3, '0')
+
+
+func _on_start_pressed() -> void:
+	get_tree().change_scene_to_file("res://Scenes/Main/game.tscn")
+
+
+func _on_exit_pressed() -> void:
+	get_tree().quit()
