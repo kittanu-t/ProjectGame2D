@@ -43,6 +43,7 @@ func _ready() -> void:
 	# เชื่อมสัญญาณที่ใช้งานจริง
 	#player.connect("change_camera_pos", Callable(self, "_on_player_change_camera_pos"))
 	#goal_area.body_entered.connect(Callable(self, "_on_goal_entered"))
+	player.connect("sfx_play", Callable(self, "_on_player_sfx"))  # <-- เพิ่มบรรทัดนี้
 
 	# เริ่มจับเวลาและ BGM เริ่มต้น
 	start_game_timer()
@@ -75,7 +76,7 @@ func _switch_bgm_by_room(room_index: int) -> void:
 	# map room_index (อาจติดลบ) -> ดัชนีเพลงแบบสมมาตรรอบ 0
 	# room >= 0 : idx = room
 	# room <  0 : idx = -room - 1   (เช่น -1->0, -2->1, -3->2, ...)
-	var idx: int = room_index if room_index >= 0 else (-room_index - 1)
+	var idx: int = room_index if room_index >= 0 else (-room_index - 0) # <— คงตามไฟล์ที่ให้มา
 	idx = clamp(idx, 0, streams.size() - 1)
 
 	var desired: AudioStream = streams[idx]

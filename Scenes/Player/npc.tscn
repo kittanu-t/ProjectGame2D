@@ -1,0 +1,41 @@
+[gd_scene load_steps=7 format=3 uid="uid://cooigxb7m3q47"]
+
+[ext_resource type="Script" uid="uid://cmlgw6fptoqva" path="res://Scenes/Player/npc.gd" id="1_kh24r"]
+[ext_resource type="Texture2D" uid="uid://hfet6pxcuot4" path="res://Assets/Characters/character_0013.png" id="1_xxcha"]
+[ext_resource type="Texture2D" uid="uid://c8tvm4w2q1gbr" path="res://Assets/Characters/character_0014.png" id="2_kh24r"]
+[ext_resource type="PackedScene" uid="uid://8l48qau4n673" path="res://Scenes/Objects/DialogueUI.tscn" id="2_ul7y6"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ul7y6"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_xxcha")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_kh24r")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 2.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bc6q4"]
+size = Vector2(476, 262)
+
+[node name="NPC" type="Node2D"]
+script = ExtResource("1_kh24r")
+dialogue_ui_scene = ExtResource("2_ul7y6")
+require_interact = true
+fall_speed_threshold = 150.0
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_ul7y6")
+animation = &"idle"
+frame_progress = 0.964399
+offset = Vector2(92, 130)
+
+[node name="TalkArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TalkArea"]
+position = Vector2(96, 68)
+shape = SubResource("RectangleShape2D_bc6q4")

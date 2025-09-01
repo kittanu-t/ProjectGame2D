@@ -4,6 +4,7 @@ extends Control
 @onready var items := $VBoxContainer.get_children()
 @onready var best_label: Label = $VBoxContainer/BestTime
 @onready var sfx_player: AudioStreamPlayer = $SFXPlayer
+#@onready var Start: Label = $VBoxContainer/Start
 
 var idx: int = 0
 
@@ -13,6 +14,7 @@ var idx: int = 0
 func _ready() -> void:
 	_update_selection()
 	_show_best_time()
+	#Start.bbcode_text = "Here is an image: [img]res://Assets/Characters/character_0014.png]"
 
 func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("menu_up"):
@@ -76,4 +78,4 @@ func _on_start_pressed() -> void:
 
 
 func _on_exit_pressed() -> void:
-	get_tree().quit
+	get_tree().quit()
