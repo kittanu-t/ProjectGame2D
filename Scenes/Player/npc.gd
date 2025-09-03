@@ -55,23 +55,36 @@ func _on_body_exited(body: Node) -> void:
 	if body == _player:
 		_player = null
 
+# -------------------- UPDATED PICK LINES --------------------
 func _pick_lines() -> PackedStringArray:
+	# 1) ถ้าตกแรง "หรือ" อยู่ในสถานะ fall state → สุ่มแซว 1 บรรทัด
+	var taunt_condition := false
 	if _player:
-		# ถ้าเข้ามาด้วยความเร็วลง (y+) สูง → แซว/เตือน
 		if _player.velocity.y > fall_speed_threshold:
-			return lines_taunt_when_fall
-	# ครั้งแรกที่เจอ → พูดสอน
+			taunt_condition = true
+		elif _is_player_fallen():
+			taunt_condition = true
+
+	if taunt_condition and lines_taunt_when_fall.size() > 0:
+		return PackedStringArray([lines_taunt_when_fall[randi() % lines_taunt_when_fall.size()]])
+
+	# 2) ครั้งแรกที่เจอ → พูดทั้งหมด (คืนทั้งอาร์เรย์)
 	if not _visited:
 		return lines_first_visit
-	# ปกติ → ให้ tips ทั่วไป (สุ่ม 1–2 บรรทัด)
-	if lines_tips.size() <= 2:
-		return lines_tips
-	else:
-		var out := PackedStringArray()
-		out.append(lines_tips[randi() % lines_tips.size()])
-		out.append(lines_tips[randi() % lines_tips.size()])
-		return out
 
+	# 3) ครั้งถัดไป → ถ้า tips > 2 ให้สุ่ม 1 บรรทัด, ไม่งั้นคืนตามที่มี
+	if lines_tips.size() > 2:
+		return PackedStringArray([lines_tips[randi() % lines_tips.size()]])
+	return lines_tips
+
+# อ่านสถานะล้ม (fall state) จาก Player อย่างปลอดภัย แม้ _player จะพิมพ์เป็น CharacterBody2D
+func _is_player_fallen() -> bool:
+	if _player == null:
+		return false
+	var v : bool = _player.get("is_fallen")  # อ่าน property แบบ dynamic (เลี่ยง error จาก static typing)
+	return v is bool and v
+
+# -------------------- SPAWN UI --------------------
 func _start_dialog(lines: PackedStringArray) -> void:
 	if dialogue_ui_scene == null:
 		push_warning("NPC: dialogue_ui_scene is NULL (ยังไม่ได้ตั้งใน Inspector)")

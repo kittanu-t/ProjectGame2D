@@ -6,7 +6,7 @@
 [node name="DialogueUI" type="CanvasLayer"]
 script = ExtResource("1_obd5m")
 ui_font = ExtResource("2_uwch2")
-ui_font_size = 20
+ui_font_size = 18
 type_speed = 0.015
 auto_advance_per_line_sec = 10.0
 auto_close_sec = 5.0

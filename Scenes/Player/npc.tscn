@@ -46,8 +46,6 @@ size = Vector2(990, 762)
 [node name="NPC" type="Node2D"]
 script = ExtResource("1_kh24r")
 dialogue_ui_scene = ExtResource("2_ul7y6")
-require_interact = true
-fall_speed_threshold = 150.0
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_ul7y6")
