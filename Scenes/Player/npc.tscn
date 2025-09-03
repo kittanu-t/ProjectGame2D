@@ -20,7 +20,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bc6q4"]
-size = Vector2(476, 262)
+size = Vector2(990, 738)
 
 [node name="NPC" type="Node2D"]
 script = ExtResource("1_kh24r")
