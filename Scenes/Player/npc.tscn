@@ -1,18 +1,39 @@
-[gd_scene load_steps=7 format=3 uid="uid://cooigxb7m3q47"]
+[gd_scene load_steps=10 format=3 uid="uid://cooigxb7m3q47"]
 
 [ext_resource type="Script" uid="uid://cmlgw6fptoqva" path="res://Scenes/Player/npc.gd" id="1_kh24r"]
-[ext_resource type="Texture2D" uid="uid://hfet6pxcuot4" path="res://Assets/Characters/character_0013.png" id="1_xxcha"]
-[ext_resource type="Texture2D" uid="uid://c8tvm4w2q1gbr" path="res://Assets/Characters/character_0014.png" id="2_kh24r"]
 [ext_resource type="PackedScene" uid="uid://8l48qau4n673" path="res://Scenes/Objects/DialogueUI.tscn" id="2_ul7y6"]
+[ext_resource type="Texture2D" uid="uid://d10urp60035m3" path="res://Assets/Characters/npc_sheet.png" id="3_ipo4y"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bhqfe"]
+atlas = ExtResource("3_ipo4y")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kl728"]
+atlas = ExtResource("3_ipo4y")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rq5y5"]
+atlas = ExtResource("3_ipo4y")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e3iho"]
+atlas = ExtResource("3_ipo4y")
+region = Rect2(96, 0, 32, 32)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_ul7y6"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("1_xxcha")
+"texture": SubResource("AtlasTexture_bhqfe")
 }, {
 "duration": 1.0,
-"texture": ExtResource("2_kh24r")
+"texture": SubResource("AtlasTexture_kl728")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rq5y5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e3iho")
 }],
 "loop": true,
 "name": &"idle",
@@ -20,7 +41,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bc6q4"]
-size = Vector2(990, 738)
+size = Vector2(990, 542)
 
 [node name="NPC" type="Node2D"]
 script = ExtResource("1_kh24r")
@@ -31,7 +52,7 @@ fall_speed_threshold = 150.0
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_ul7y6")
 animation = &"idle"
-frame_progress = 0.964399
+frame_progress = 0.686593
 offset = Vector2(92, 130)
 
 [node name="TalkArea" type="Area2D" parent="."]
