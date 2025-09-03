@@ -541,6 +541,9 @@ process_material = SubResource("ParticleProcessMaterial_nm5a3")
 
 [node name="NPC" parent="." instance=ExtResource("28_35532")]
 position = Vector2(245, 318)
+require_interact = false
+fall_speed_threshold = 100.0
+cooldown_sec = 1.0
 
 [connection signal="change_camera_pos" from="Player" to="." method="_on_player_change_camera_pos"]
 [connection signal="body_entered" from="GoalArea" to="." method="_on_goal_entered"]
