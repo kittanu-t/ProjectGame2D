@@ -4,6 +4,8 @@ extends CanvasLayer
 @onready var panel: Control = $PanelContainer
 @onready var text: RichTextLabel = $PanelContainer/VBoxContainer/Text
 @onready var hint: Label = $PanelContainer/VBoxContainer/Hint
+@export var ui_font: Font
+@export var ui_font_size: int = 24
 
 @export var advance_actions: PackedStringArray = ["ui_accept", "Jump"]
 @export var type_speed: float = 0.02         # วินาที/ตัวอักษร; 0 = โชว์ทันที
@@ -20,8 +22,15 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_WHEN_PAUSED
 	panel.set_anchors_preset(Control.PRESET_FULL_RECT)
 	# กันกรณีธีมทำให้มองไม่เห็นตัวอักษร
-	text.add_theme_color_override("default_color", Color(1,1,1,1))
-	hint.add_theme_color_override("font_color", Color(1,1,1,0.85))
+	if ui_font:
+		# RichTextLabel ใช้คีย์ "normal_font" / "normal_font_size"
+		text.add_theme_font_override("normal_font", ui_font)
+		text.add_theme_font_size_override("normal_font_size", ui_font_size)
+		# Label ใช้คีย์ "font" / "font_size"
+		hint.add_theme_font_override("font", ui_font)
+		hint.add_theme_font_size_override("font_size", ui_font_size - 2)
+	#text.add_theme_color_override("default_color", Color(1,1,1,1))
+	#hint.add_theme_color_override("font_color", Color(1,1,1,0.85))
 	show()
 
 func start(lines: PackedStringArray) -> void:

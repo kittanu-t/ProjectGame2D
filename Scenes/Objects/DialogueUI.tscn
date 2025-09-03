@@ -1,9 +1,11 @@
-[gd_scene load_steps=2 format=3 uid="uid://8l48qau4n673"]
+[gd_scene load_steps=3 format=3 uid="uid://8l48qau4n673"]
 
 [ext_resource type="Script" uid="uid://bwvdi7byjammw" path="res://Scenes/Objects/dialogue_ui.gd" id="1_obd5m"]
+[ext_resource type="FontFile" uid="uid://co1gonagrp7dq" path="res://Assets/font/Bf_fakthongDemo.ttf" id="2_uwch2"]
 
 [node name="DialogueUI" type="CanvasLayer"]
 script = ExtResource("1_obd5m")
+ui_font = ExtResource("2_uwch2")
 type_speed = 0.015
 auto_advance_per_line_sec = 10.0
 auto_close_sec = 5.0
@@ -28,6 +30,8 @@ size_flags_vertical = 4
 [node name="Text" type="RichTextLabel" parent="PanelContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 143.47)
 layout_mode = 2
+text = "awdawd
+ฟไกฟกฟดาืะำเ"
 scroll_active = false
 tab_size = 2
 
