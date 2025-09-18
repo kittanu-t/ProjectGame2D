@@ -263,7 +263,7 @@ sfx_coin = ExtResource("8_lgr81")
 
 [node name="Player" parent="." instance=ExtResource("1_3q5hp")]
 top_level = true
-position = Vector2(228, -1539)
+position = Vector2(233, -1548)
 FALL_DAMAGE_HEIGHT = 180.0
 
 [node name="CoinRoots" type="Node2D" parent="."]
